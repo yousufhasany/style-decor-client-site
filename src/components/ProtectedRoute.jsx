@@ -1,98 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
+// ProtectedRoute
+// - Always checks Firebase auth
+// - Optionally checks role ONLY when requiredRole is provided
+// - Never sends you to /login because of role; only because of auth
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { currentUser, loading: authLoading } = useAuth();
   const location = useLocation();
-  const [userRole, setUserRole] = useState(null);
-  const [roleLoading, setRoleLoading] = useState(true);
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [roleLoading, setRoleLoading] = useState(!!requiredRole);
+  const [hasRequiredRole, setHasRequiredRole] = useState(true); // default true when no role
 
-  console.log('=== PROTECTED ROUTE v4 RENDER ===', { 
-    currentUser: currentUser?.email || 'none', 
-    authLoading, 
-    roleLoading,
+  console.log('=== PROTECTED ROUTE SIMPLE+ROLE ===', {
+    path: location.pathname,
+    hasUser: !!currentUser,
+    authLoading,
     requiredRole,
-    hasToken: !!localStorage.getItem('token')
+    roleLoading,
+    hasRequiredRole
   });
 
-  useEffect(() => {
-    const verifyTokenAndRole = async () => {
-      // Wait for auth to finish loading
-      if (authLoading) {
-        console.log('=== PROTECTED ROUTE v4: Auth still loading, waiting... ===');
-        return;
-      }
-
-      // No user after auth loaded
-      if (!currentUser) {
-        console.log('=== PROTECTED ROUTE v4: No user after auth loaded ===');
-        setRoleLoading(false);
-        return;
-      }
-
-      console.log('=== PROTECTED ROUTE v4: User found, fetching role ===', currentUser.email);
-
-      try {
-        // Get JWT token from Firebase
-        const token = await currentUser.getIdToken(true);
-        localStorage.setItem('token', token);
-        
-        // Verify token and get user data with role
-        const response = await api.get(`/users/${currentUser.uid}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const role = response.data.user?.role || response.data.role || 'user';
-        console.log('=== PROTECTED ROUTE v4: Role fetched ===', role);
-        setUserRole(role);
-
-        // Check if user has required role
-        if (requiredRole) {
-          if (role === requiredRole) {
-            setIsAuthorized(true);
-          } else {
-            setIsAuthorized(false);
-            toast.error(`Access denied. This page requires ${requiredRole} role.`);
-          }
-        } else {
-          // No specific role required, just authenticated
-          setIsAuthorized(true);
-        }
-
-      } catch (error) {
-        console.error('=== PROTECTED ROUTE v4: Error fetching role ===', error);
-        
-        // Handle different error types
-        if (error.response?.status === 401) {
-          toast.error('Session expired. Please login again.');
-          localStorage.removeItem('token');
-          setIsAuthorized(false);
-        } else if (error.response?.status === 403) {
-          toast.error('Access forbidden. Insufficient permissions.');
-          setIsAuthorized(false);
-        } else {
-          // Network or other errors - default to user role
-          console.log('=== PROTECTED ROUTE v4: Network error, defaulting to user role ===');
-          setUserRole('user');
-          setIsAuthorized(!requiredRole || requiredRole === 'user');
-        }
-      } finally {
-        setRoleLoading(false);
-      }
-    };
-
-    verifyTokenAndRole();
-  }, [currentUser, authLoading, requiredRole]);
-
-  // CRITICAL: Wait for auth to finish loading
+  // 1) Auth check
   if (authLoading) {
-    console.log('=== PROTECTED ROUTE v4: Showing auth loading spinner ===');
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
         <div className="text-center">
@@ -103,15 +34,40 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     );
   }
 
-  // Auth finished loading, but no user found
   if (!currentUser) {
-    console.log('=== PROTECTED ROUTE v4: Redirecting to login - no user ===');
+    console.log('=== PROTECTED ROUTE: redirecting to login (no user) ===');
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Wait for role to be fetched
+  // 2) If no specific role required, allow access
+  if (!requiredRole) {
+    return children;
+  }
+
+  // 3) When a specific role is required (admin/decorator), fetch role once
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!requiredRole || !currentUser) return;
+
+      try {
+        setRoleLoading(true);
+        const response = await api.get(`/users/${currentUser.uid}`);
+        const role = response.data.user?.role || response.data.role || 'user';
+        console.log('=== PROTECTED ROUTE: fetched role ===', role);
+        setHasRequiredRole(role === requiredRole);
+      } catch (error) {
+        console.error('=== PROTECTED ROUTE: error fetching role ===', error);
+        // On error, just deny access to this protected page
+        setHasRequiredRole(false);
+      } finally {
+        setRoleLoading(false);
+      }
+    };
+
+    fetchRole();
+  }, [currentUser, requiredRole]);
+
   if (roleLoading) {
-    console.log('=== PROTECTED ROUTE v4: Showing role loading spinner ===');
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
         <div className="text-center">
@@ -122,13 +78,19 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     );
   }
 
-  // Check role authorization
-  if (requiredRole && !isAuthorized) {
-    console.log('=== PROTECTED ROUTE v4: Not authorized for role ===', { requiredRole, userRole });
-    return <Navigate to="/dashboard" replace />;
+  if (!hasRequiredRole) {
+    // Show a simple 403 page instead of redirecting to login
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
+        <div className="text-center max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 border border-red-100">
+          <h1 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h1>
+          <p className="text-gray-700 mb-4">You don&apos;t have permission to view this page.</p>
+          <p className="text-sm text-gray-500">Required role: <span className="font-semibold">{requiredRole}</span></p>
+        </div>
+      </div>
+    );
   }
 
-  console.log('=== PROTECTED ROUTE v4: Access granted ===');
   return children;
 };
 

@@ -4,30 +4,43 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
 const Dashboard = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserRole = async () => {
-      if (currentUser) {
-        try {
-          const response = await api.get(`/users/${currentUser.uid}`);
-          setUserRole(response.data.user?.role || response.data.role || 'user');
-        } catch (error) {
-          console.error('Error fetching user role:', error);
-          // Default to user dashboard if fetch fails
-          setUserRole('user');
-        } finally {
-          setLoading(false);
-        }
+      // Wait for auth to finish loading
+      if (authLoading) {
+        console.log('=== DASHBOARD: Waiting for auth to load ===');
+        return;
+      }
+
+      if (!currentUser) {
+        console.log('=== DASHBOARD: No user found ===');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log('=== DASHBOARD: Fetching role for', currentUser.email, '===');
+        const response = await api.get(`/users/${currentUser.uid}`);
+        const role = response.data.user?.role || response.data.role || 'user';
+        console.log('=== DASHBOARD: Role is', role, '===');
+        setUserRole(role);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+        // Default to user dashboard if fetch fails
+        setUserRole('user');
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserRole();
-  }, [currentUser]);
+  }, [currentUser, authLoading]);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
@@ -36,6 +49,11 @@ const Dashboard = () => {
         </div>
       </div>
     );
+  }
+
+  // ProtectedRoute handles auth redirect
+  if (!currentUser) {
+    return null;
   }
 
   // Redirect based on user role

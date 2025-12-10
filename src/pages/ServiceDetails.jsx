@@ -78,23 +78,26 @@ const ServiceDetails = () => {
   };
 
   const handleBookNow = () => {
-    console.log('=== NEW CODE: handleBookNow called - showing form directly ===');
-    console.log('Before setState - showBookingForm:', showBookingForm);
-    // Simply show the form - we'll check auth when submitting
-    setShowBookingForm(true);
-    console.log('After setState - form should show now');
-    
-    // Update form with user data if available
+    console.log('=== BOOK NOW: Checking authentication ===');
     const user = currentUser || auth.currentUser;
-    if (user) {
-      setBookingData(prev => ({
-        ...prev,
-        name: user.displayName || user.email?.split('@')[0] || prev.name,
-        email: user.email || prev.email
-      }));
+    
+    if (!user) {
+      toast.error('Please login to book this service');
+      navigate('/login', { state: { from: `/services/${id}` } });
+      return;
     }
     
-    // Scroll to booking form after a short delay
+    console.log('=== BOOK NOW: User authenticated, showing form ===');
+    setShowBookingForm(true);
+    
+    // Update form with user data
+    setBookingData(prev => ({
+      ...prev,
+      name: user.displayName || user.email?.split('@')[0] || prev.name,
+      email: user.email || prev.email
+    }));
+    
+    // Scroll to booking form
     setTimeout(() => {
       const formElement = document.getElementById('booking-form');
       if (formElement) {

@@ -37,22 +37,13 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/dashboard/user" 
-                element={
-                  <ProtectedRoute>
-                    <UserDashboard />
-                  </ProtectedRoute>
-                } 
-              />
+
+              {/* Keep normal dashboard/profile open (no role checks) */}
+              <Route path="/profile" element={<UserDashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/user" element={<UserDashboard />} />
+
+              {/* Add back role protection ONLY for admin & decorator dashboards */}
               <Route 
                 path="/dashboard/admin" 
                 element={
