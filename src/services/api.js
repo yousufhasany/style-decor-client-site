@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -50,5 +50,45 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// API methods for services
+export const servicesAPI = {
+  getAll: (params) => api.get('/services', { params }),
+  getFeatured: (limit = 6) => api.get('/services/featured', { params: { limit } }),
+  getCategories: () => api.get('/services/categories'),
+  getById: (id) => api.get(`/services/${id}`),
+  create: (data) => api.post('/services', data),
+  update: (id, data) => api.put(`/services/${id}`, data),
+  delete: (id) => api.delete(`/services/${id}`)
+};
+
+// API methods for bookings
+export const bookingsAPI = {
+  create: (data) => api.post('/bookings', data),
+  getByUserId: (userId) => api.get(`/bookings/user/${userId}`),
+  getById: (id) => api.get(`/bookings/${id}`),
+  update: (id, data) => api.put(`/bookings/${id}`, data),
+  cancel: (id) => api.delete(`/bookings/${id}`)
+};
+
+// API methods for users
+export const usersAPI = {
+  create: (data) => api.post('/users', data),
+  getById: (id) => api.get(`/users/${id}`),
+  update: (id, data) => api.put(`/users/${id}`, data),
+  delete: (id) => api.delete(`/users/${id}`)
+};
+
+// API methods for decorators
+export const decoratorsAPI = {
+  getAll: () => api.get('/decorators'),
+  getTop: () => api.get('/decorators/top'),
+  getById: (id) => api.get(`/decorators/${id}`)
+};
+
+// API methods for contact
+export const contactAPI = {
+  send: (data) => api.post('/contact', data)
+};
 
 export default api;
