@@ -174,8 +174,14 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100 py-12 px-4">
-      <div className="max-w-md mx-auto">
+    <div
+      className="min-h-screen py-12 px-4 flex items-center bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          'linear-gradient(135deg, rgba(15,23,42,0.8), rgba(59,130,246,0.7)), url("https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1600&q=80")'
+      }}
+    >
+      <div className="max-w-md mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -202,7 +208,7 @@ const Register = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="btn btn-outline w-full mb-6"
+            className="btn btn-outline w-full mb-6 gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -210,10 +216,10 @@ const Register = () => {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Continue with Google
+            <span>Continue with Google</span>
           </button>
 
-          <div className="divider">OR</div>
+          <div className="divider text-xs text-gray-400">OR</div>
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -306,11 +312,10 @@ const Register = () => {
                 <option value="user">User (Book decoration services)</option>
                 <option value="decorator">Decorator (I want to work as decorator)</option>
               </select>
-              <label className="label">
-                <span className="label-text-alt text-gray-500 text-xs">
-                  Note: Admin will review and approve decorator accounts. Selecting "Decorator" here does not immediately give decorator access.
-                </span>
-              </label>
+              <p className="mt-1 text-xs text-gray-500 leading-snug">
+                Note: Admin will review and approve decorator accounts. Selecting "Decorator" here does
+                not immediately give decorator access.
+              </p>
             </div>
 
             {/* Password */}

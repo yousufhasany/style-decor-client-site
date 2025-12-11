@@ -27,7 +27,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
@@ -42,8 +42,8 @@ const Navbar = () => {
             <span className="text-xs text-gray-400 ml-2">v4</span>
           </Link>
 
-          {/* Center Navigation (public pages only as per requirements) */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-12">
+          {/* Center Navigation (desktop) */}
+          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10">
             <Link 
               to="/" 
               className="text-[15px] font-medium text-gray-700 hover:text-purple-600 transition-colors"
@@ -73,7 +73,25 @@ const Navbar = () => {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-purple-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 mr-1"
+              onClick={() => setIsMenuOpen(prev => !prev)}
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMenuOpen ? (
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+
             {currentUser ? (
               <>
                 <Link 
@@ -131,6 +149,43 @@ const Navbar = () => {
             )}
           </div>
         </div>
+        {/* Mobile navigation menu */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-4 pt-3 pb-4 space-y-3">
+              <Link
+                to="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-[15px] font-medium text-gray-700 hover:text-purple-600"
+              >
+                Home
+              </Link>
+              {(!currentUser || userRole !== 'decorator') && (
+                <Link
+                  to="/services"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-[15px] font-medium text-gray-700 hover:text-purple-600"
+                >
+                  Services
+                </Link>
+              )}
+              <Link
+                to="/about"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-[15px] font-medium text-gray-700 hover:text-purple-600"
+              >
+                About Us
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-[15px] font-medium text-gray-700 hover:text-purple-600"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
