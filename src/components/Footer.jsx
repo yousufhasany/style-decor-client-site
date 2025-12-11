@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/smarthome.png';
 
 const Footer = () => {
   return (
@@ -9,10 +10,10 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
-                <span className="text-lg font-black text-white">S</span>
+              <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-lg overflow-hidden">
+                <img src={logo} alt="SmartDecor logo" className="w-8 h-8 object-contain" />
               </div>
-              <span className="text-lg font-bold">StyleDecor</span>
+              <span className="text-lg font-bold">SmartDecor</span>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Transforming spaces into extraordinary experiences with creative decoration solutions.
@@ -119,7 +120,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} StyleDecor. All rights reserved.
+            © {new Date().getFullYear()} SmartDecor. All rights reserved Yousuf Hasan.
           </p>
           <div className="flex gap-4 text-sm text-gray-400">
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>

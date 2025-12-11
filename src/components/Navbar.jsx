@@ -34,11 +34,11 @@ const Navbar = () => {
             <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
               <img
                 src={logo}
-                alt="StyleDecor logo"
+                alt="SmartDecor logo"
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-xl font-bold text-gray-900">StyleDecor</span>
+            <span className="text-xl font-bold text-gray-900">SmartDecor</span>
             <span className="text-xs text-gray-400 ml-2">v4</span>
           </Link>
 

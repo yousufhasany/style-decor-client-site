@@ -267,7 +267,7 @@ const AdminDashboard = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-lg">S</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">StyleDecor</span>
+            <span className="text-xl font-bold text-gray-900">SmartDecor</span>
           </div>
 
           <div className="mb-8">
