@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-
+import logo from '../assets/smarthome.png';
 const Navbar = () => {
   const { currentUser, userRole, logout, loading } = useAuth();
   const navigate = useNavigate();
@@ -31,8 +31,12 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-11 h-11 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-              <span className="text-xl font-black text-white">S</span>
+            <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
+              <img
+                src={logo}
+                alt="StyleDecor logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-xl font-bold text-gray-900">StyleDecor</span>
             <span className="text-xs text-gray-400 ml-2">v4</span>

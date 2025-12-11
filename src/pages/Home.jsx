@@ -89,7 +89,16 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 lg:py-32 px-4 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
+      <section
+        className="relative overflow-hidden py-20 lg:py-32 px-4"
+        style={{
+          backgroundImage:
+            'url("https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
