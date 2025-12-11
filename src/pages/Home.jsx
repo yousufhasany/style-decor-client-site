@@ -44,15 +44,33 @@ const Home = () => {
 
   const fetchTopDecorators = async () => {
     try {
-      const response = await decoratorsAPI.getTop();
-      const fetchedDecorators = response.data.decorators || response.data || [];
-      
-      // Ensure decorators is always an array
-      if (Array.isArray(fetchedDecorators)) {
-        setTopDecorators(fetchedDecorators);
-      } else {
-        setTopDecorators([]);
-      }
+      // Use real decorators from backend
+      const response = await decoratorsAPI.getAll();
+      const raw = response.data?.data || response.data?.decorators || response.data || [];
+
+      const decoratorsArray = Array.isArray(raw) ? raw : [];
+
+      // Keep only approved decorators, sort by rating, and take top 4
+      const normalized = decoratorsArray
+        // Show all decorator accounts here; admin approval still controls booking access
+        .filter((d) => d.role === 'decorator')
+        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        .slice(0, 4)
+        .map((d) => ({
+          _id: d._id,
+          name: d.name,
+          image:
+            d.photoURL ||
+            'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80',
+          rating: typeof d.rating === 'number' ? d.rating.toFixed(1) : '5.0',
+          projects: d.totalProjects || 0,
+          specialty: Array.isArray(d.specialties) && d.specialties.length > 0
+            ? d.specialties[0]
+            : 'Event Decorator',
+          email: d.email
+        }));
+
+      setTopDecorators(normalized);
     } catch (error) {
       console.error('Error fetching decorators:', error);
       // Use mock data for development (backend endpoint not created yet)
@@ -414,9 +432,13 @@ const Home = () => {
                       {decorator.projects}+ projects
                     </div>
                   </div>
-                  <button className="btn btn-sm bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0 mt-4 w-full shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold">
+                  <Link
+                    to="/contact"
+                    state={{ decoratorEmail: decorator.email, decoratorName: decorator.name }}
+                    className="btn btn-sm bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0 mt-4 w-full shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold"
+                  >
                     View Profile
-                  </button>
+                  </Link>
                 </div>
               </motion.div>
             ))}
