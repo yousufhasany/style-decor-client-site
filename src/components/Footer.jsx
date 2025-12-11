@@ -107,7 +107,7 @@ const Footer = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-400 mt-0.5">📍</span>
-                <span>Mumbai, Maharashtra, India</span>
+                <span> Bashundhara R/A,Dhaka, Bangladesh</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-pink-400 mt-0.5">⏰</span>

@@ -106,9 +106,9 @@ const DecoratorDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 fixed h-full">
+      <aside className="w-full md:w-64 bg-white border-r border-gray-200 md:fixed md:h-full z-20 md:z-auto">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-8">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
@@ -162,7 +162,7 @@ const DecoratorDashboard = () => {
           </nav>
         </div>
 
-        <div className="absolute bottom-0 w-64 p-6 border-t border-gray-200">
+        <div className="md:absolute md:bottom-0 md:w-64 p-6 border-t border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-semibold">
               {currentUser?.email?.[0].toUpperCase()}
@@ -178,8 +178,8 @@ const DecoratorDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 mt-4 md:mt-0">
+        <div className="max-w-full md:max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Decorator Dashboard</h1>

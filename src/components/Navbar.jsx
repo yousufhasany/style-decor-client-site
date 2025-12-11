@@ -111,23 +111,23 @@ const Navbar = () => {
                   </div>
                   <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-white rounded-lg w-52 border border-gray-200">
                     <li className="menu-title px-4 py-2">
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-black">
                         {currentUser.displayName || 'User'}
                       </span>
-                      <span className="text-xs text-gray-500">{currentUser.email}</span>
+                      <span className="text-xs text-black">{currentUser.email}</span>
                     </li>
-                    <li><Link to="/profile">Profile Settings</Link></li>
+                    <li><Link to="/profile" className="text-black">Profile Settings</Link></li>
                     <li>
                       {userRole === 'decorator' ? (
-                        <Link to="/dashboard/decorator">Decorator Dashboard</Link>
+                        <Link to="/dashboard/decorator" className="text-black">Decorator Dashboard</Link>
                       ) : userRole === 'admin' ? (
-                        <Link to="/dashboard/admin">Admin Dashboard</Link>
+                        <Link to="/dashboard/admin" className="text-black">Admin Dashboard</Link>
                       ) : (
-                        <Link to="/dashboard/user">My Bookings</Link>
+                        <Link to="/dashboard/user" className="text-black">My Bookings</Link>
                       )}
                     </li>
                     <div className="divider my-0"></div>
-                    <li><button onClick={handleLogout} className="text-red-600">Logout</button></li>
+                    <li><button onClick={handleLogout} className="text-black">Logout</button></li>
                   </ul>
                 </div>
               </>

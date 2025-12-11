@@ -141,7 +141,7 @@ const Bookings = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-100 via-purple-100 to-pink-100">
         <span className="loading loading-spinner loading-lg text-purple-600"></span>
       </div>
     );
@@ -149,10 +149,10 @@ const Bookings = () => {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-100 via-purple-100 to-pink-100">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Please login to view your bookings</h2>
-          <Link to="/login" className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
+          <Link to="/login" className="btn bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
             Login
           </Link>
         </div>
@@ -161,7 +161,7 @@ const Bookings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-100 via-purple-100 to-pink-100 py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -169,7 +169,7 @@ const Bookings = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-4">
             My Bookings
           </h1>
           <p className="text-gray-600 text-lg">
@@ -189,7 +189,7 @@ const Bookings = () => {
               onClick={() => setFilter(status)}
               className={`btn btn-sm ${
                 filter === status
-                  ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0'
+                  ? 'bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0'
                   : 'btn-outline'
               }`}
             >
@@ -217,7 +217,7 @@ const Bookings = () => {
                 : `No ${filter} bookings found.`
               }
             </p>
-            <Link to="/services" className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
+            <Link to="/services" className="btn bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
               Browse Services
             </Link>
           </motion.div>
@@ -232,7 +232,7 @@ const Bookings = () => {
               <motion.div
                 key={booking._id}
                 variants={itemVariants}
-                className="card bg-white shadow-xl hover:shadow-2xl transition-all duration-300"
+                className={`card shadow-xl hover:shadow-2xl transition-all duration-300 ${booking.status?.toLowerCase() === 'confirmed' ? 'bg-gradient-to-r from-blue-200 via-purple-100 to-pink-100' : 'bg-white'}`}
               >
                 <div className="card-body">
                   <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -240,10 +240,10 @@ const Bookings = () => {
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="card-title text-2xl text-gray-900">
+                          <h3 className="card-title text-2xl font-bold text-gray-900">
                             {booking.serviceId?.service_name || booking.serviceName || 'Service Booking'}
                           </h3>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-700">
                             Booking ID: {booking._id.slice(-8).toUpperCase()}
                           </p>
                         </div>
@@ -252,7 +252,7 @@ const Bookings = () => {
                         </span>
                       </div>
 
-                      <div className="space-y-2 text-gray-600">
+                      <div className="space-y-2 text-gray-800">
                         <div className="flex items-center gap-2">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -331,7 +331,7 @@ const Bookings = () => {
                       {booking.paymentStatus !== 'paid' && booking.status?.toLowerCase() !== 'cancelled' && (
                         <button
                           onClick={() => handlePayNow(booking._id)}
-                          className="btn btn-sm bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0"
+                          className="btn btn-sm bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0"
                         >
                           Pay Now
                         </button>
@@ -405,7 +405,7 @@ const Bookings = () => {
                                 type="button"
                                 onClick={() => handleSubmitRating(booking._id)}
                                 disabled={submittingRatingId === booking._id}
-                                className="btn btn-xs bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0"
+                                className="btn btn-xs bg-linear-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0"
                               >
                                 {submittingRatingId === booking._id ? 'Submitting...' : 'Submit Rating'}
                               </button>

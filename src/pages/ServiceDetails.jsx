@@ -204,237 +204,14 @@ const ServiceDetails = () => {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {/* Service Image */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative h-96 rounded-2xl overflow-hidden shadow-lg mb-8"
-            >
-              <img
-                src={service.image || 'https://via.placeholder.com/800'}
-                alt={service.service_name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-4 right-4">
-                <span className="badge bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white border-0 badge-lg shadow-xl font-bold capitalize">{service.category}</span>
-              </div>
-            </motion.div>
-
-            {/* Service Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-8 border-2 border-purple-300"
-            >
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-4">{service.service_name}</h1>
-              
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <span className="font-semibold">{service.rating || '4.8'}</span>
-                </div>
-                <span className="text-gray-500">({service.reviews || '100'} reviews)</span>
-              </div>
-
-              <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                {service.description}
-              </p>
-
-              <div className="divider"></div>
-
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Service Details</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-gray-900">Category</p>
-                    <p className="text-gray-600 capitalize">{service.category}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-gray-900">Pricing Unit</p>
-                    <p className="text-gray-600">{service.unit}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-gray-900">Created By</p>
-                    <p className="text-gray-600 text-sm">{service.createdByEmail}</p>
-                  </div>
-                </div>
-                {(service.features || []).map((feature, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Booking Form */}
-            {showBookingForm && (
-              <motion.div
-                id="booking-form"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 border-2 border-purple-300"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Booking Details</h2>
-                  <span className="badge badge-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
-                    Step 1 of 2
-                  </span>
-                </div>
-                <form onSubmit={handleSubmitBooking} className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Full Name *</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={bookingData.name}
-                        onChange={handleInputChange}
-                        className="input input-bordered"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Email *</span>
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={bookingData.email}
-                        onChange={handleInputChange}
-                        className="input input-bordered"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Phone Number *</span>
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={bookingData.phone}
-                        onChange={handleInputChange}
-                        className="input input-bordered"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Event Date *</span>
-                      </label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={bookingData.date}
-                        onChange={handleInputChange}
-                        className="input input-bordered"
-                        min={new Date().toISOString().split('T')[0]}
-                        required
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Event Time *</span>
-                      </label>
-                      <input
-                        type="time"
-                        name="time"
-                        value={bookingData.time}
-                        onChange={handleInputChange}
-                        className="input input-bordered"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Event Address *</span>
-                    </label>
-                    <textarea
-                      name="address"
-                      value={bookingData.address}
-                      onChange={handleInputChange}
-                      className="textarea textarea-bordered h-20"
-                      required
-                    ></textarea>
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Additional Notes</span>
-                    </label>
-                    <textarea
-                      name="notes"
-                      value={bookingData.notes}
-                      onChange={handleInputChange}
-                      className="textarea textarea-bordered h-24"
-                      placeholder="Any special requirements or preferences..."
-                    ></textarea>
-                  </div>
-
-                  <div className="flex gap-4 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowBookingForm(false)}
-                      className="btn btn-outline flex-1"
-                      disabled={submitting}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0 flex-1 shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold"
-                      disabled={submitting}
-                    >
-                      {submitting ? <span className="loading loading-spinner"></span> : 'Confirm Booking'}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Sidebar: Price Card - show first on mobile */}
+          <div className="lg:col-span-1 order-1 lg:order-2 mb-8 lg:mb-0">
             {/* Price Card */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 sticky top-24 border-2 border-purple-400"
+              className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 sticky lg:top-24 border-2 border-purple-400"
             >
               <div className="mb-6">
                 <p className="text-gray-600 mb-2">Starting from</p>
@@ -519,6 +296,231 @@ const ServiceDetails = () => {
                 </p>
               </div>
             </motion.div>
+          </div>
+          {/* Main Content: Booking Details - show second on mobile */}
+          <div className="lg:col-span-2 order-2 lg:order-1">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              {/* Service Image */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative h-96 rounded-2xl overflow-hidden shadow-lg mb-8"
+              >
+                <img
+                  src={service.image || 'https://via.placeholder.com/800'}
+                  alt={service.service_name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 right-4">
+                  <span className="badge bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white border-0 badge-lg shadow-xl font-bold capitalize">{service.category}</span>
+                </div>
+              </motion.div>
+
+              {/* Service Info */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-8 mb-8 border-2 border-purple-300"
+              >
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-4">{service.service_name}</h1>
+                
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-yellow-400">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="font-semibold">{service.rating || '4.8'}</span>
+                  </div>
+                  <span className="text-gray-500">({service.reviews || '100'} reviews)</span>
+                </div>
+
+                <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                  {service.description}
+                </p>
+
+                <div className="divider"></div>
+
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Service Details</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-gray-900">Category</p>
+                      <p className="text-gray-600 capitalize">{service.category}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <svg className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-gray-900">Pricing Unit</p>
+                      <p className="text-gray-600">{service.unit}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <svg className="w-6 h-6 text-purple-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold text-gray-900">Created By</p>
+                      <p className="text-gray-600 text-sm">{service.createdByEmail}</p>
+                    </div>
+                  </div>
+                  {(service.features || []).map((feature, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <svg className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-gray-700">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Booking Form */}
+              {showBookingForm && (
+                <motion.div
+                  id="booking-form"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 backdrop-blur-md rounded-2xl shadow-xl p-8 border-2 border-purple-300"
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-black">Booking Details</h2>
+                    <span className="badge badge-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+                      Step 1 of 2
+                    </span>
+                  </div>
+                  <form onSubmit={handleSubmitBooking} className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold text-black">Full Name *</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={bookingData.name}
+                          onChange={handleInputChange}
+                          className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold text-black">Email *</span>
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={bookingData.email}
+                          onChange={handleInputChange}
+                          className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold text-black">Phone Number *</span>
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={bookingData.phone}
+                          onChange={handleInputChange}
+                          className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold text-black">Event Date *</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="date"
+                          value={bookingData.date}
+                          onChange={handleInputChange}
+                          className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                          min={new Date().toISOString().split('T')[0]}
+                          required
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label className="label">
+                          <span className="label-text font-semibold text-black">Event Time *</span>
+                        </label>
+                        <input
+                          type="time"
+                          name="time"
+                          value={bookingData.time}
+                          onChange={handleInputChange}
+                          className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text font-semibold text-black">Event Address *</span>
+                      </label>
+                      <textarea
+                        name="address"
+                        value={bookingData.address}
+                        onChange={handleInputChange}
+                        className="textarea textarea-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 h-20"
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text font-semibold text-black">Additional Notes</span>
+                      </label>
+                      <textarea
+                        name="notes"
+                        value={bookingData.notes}
+                        onChange={handleInputChange}
+                        className="textarea textarea-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 h-24"
+                        placeholder="Any special requirements or preferences..."
+                      ></textarea>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowBookingForm(false)}
+                        className="btn flex-1 bg-black text-white font-bold shadow-lg hover:bg-gray-900 hover:scale-105 transition-all"
+                        disabled={submitting}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0 flex-1 shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold"
+                        disabled={submitting}
+                      >
+                        {submitting ? <span className="loading loading-spinner"></span> : 'Confirm Booking'}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+            </div>
           </div>
         </div>
       </div>

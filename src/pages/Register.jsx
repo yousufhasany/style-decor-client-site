@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 const Register = () => {
   const navigate = useNavigate();
   const { register: registerUser, signInWithGoogle } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state for form submission
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -177,16 +177,15 @@ const Register = () => {
     <div
       className="min-h-screen py-12 px-4 flex items-center bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage:
-          'linear-gradient(135deg, rgba(15,23,42,0.8), rgba(59,130,246,0.7)), url("https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1600&q=80")'
+            backgroundImage: 'linear-gradient(135deg, rgba(15,23,42,0.8), rgba(59,130,246,0.7)), url("https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1600&q=80")'
       }}
     >
       <div className="max-w-md mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-2xl p-8 border-4 border-transparent bg-clip-padding backdrop-blur-sm"
-          style={{ backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #667eea 0%, #764ba2 100%)', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box' }}
+          className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 rounded-2xl shadow-2xl p-4 md:p-8 border-4 border-transparent bg-clip-padding backdrop-blur-sm"
+          style={{ backgroundImage: 'linear-gradient(135deg, #f3e8ff 0%, #ffe4e6 50%, #ffedd5 100%)', backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box' }}
         >
           {/* Header */}
           <div className="text-center mb-8">
@@ -200,23 +199,21 @@ const Register = () => {
                 <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
               </svg>
             </motion.div>
-            <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-            <p className="text-gray-600 mt-2">Join us and start decorating!</p>
+            <h2 className="text-3xl font-bold text-black">Create Account</h2>
+            <p className="text-black mt-2">Join us and start decorating!</p>
           </div>
 
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
+            className="btn w-full mb-6 gap-2 bg-black text-white font-bold shadow-lg hover:bg-gray-900 hover:scale-105 transition-all"
+            type="button"
             disabled={loading}
-            className="btn btn-outline w-full mb-6 gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              <path d="M21.35 11.1h-9.17v2.98h5.27c-.23 1.22-1.39 3.59-5.27 3.59-3.17 0-5.76-2.63-5.76-5.87s2.59-5.87 5.76-5.87c1.81 0 3.02.77 3.72 1.43l2.54-2.47C16.44 3.99 14.56 3 12.18 3 6.98 3 2.82 7.16 2.82 12.36s4.16 9.36 9.36 9.36c5.39 0 8.96-3.78 8.96-9.09 0-.61-.07-1.07-.15-1.53z" fill="#fff"/>
             </svg>
-            <span>Continue with Google</span>
+            Continue with Google
           </button>
 
           <div className="divider text-xs text-gray-400">OR</div>
@@ -226,7 +223,7 @@ const Register = () => {
             {/* Profile Image */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Profile Picture (Optional)</span>
+                <span className="label-text font-semibold text-black">Profile Picture (Optional)</span>
               </label>
               <div className="flex items-center gap-4">
                 <div className="avatar">
@@ -246,7 +243,7 @@ const Register = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="file-input file-input-bordered file-input-sm flex-1"
+                  className="input input-bordered bg-white/80 text-black border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 />
               </div>
             </div>
@@ -254,14 +251,14 @@ const Register = () => {
             {/* Name */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Full Name *</span>
+                <span className="label-text font-semibold text-black">Full Name *</span>
               </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="input input-bordered"
+                className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 placeholder="John Doe"
                 required
               />
@@ -270,14 +267,14 @@ const Register = () => {
             {/* Email */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Email *</span>
+                <span className="label-text font-semibold text-black">Email *</span>
               </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="input input-bordered"
+                className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 placeholder="john@example.com"
                 required
               />
@@ -286,28 +283,30 @@ const Register = () => {
             {/* Phone */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Phone Number</span>
+                <span className="label-text font-semibold text-black">Phone Number *</span>
               </label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="input input-bordered"
+                className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 placeholder="+91 1234567890"
+                required
               />
             </div>
 
             {/* Account Type (request) */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Account Type</span>
+                <span className="label-text font-semibold text-black">Account Type</span>
               </label>
               <select
                 name="accountType"
                 value={formData.accountType}
                 onChange={handleInputChange}
-                className="select select-bordered w-full"
+                className="select select-bordered bg-white/80 text-black border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
+                required
               >
                 <option value="user">User (Book decoration services)</option>
                 <option value="decorator">Decorator (I want to work as decorator)</option>
@@ -321,14 +320,14 @@ const Register = () => {
             {/* Password */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Password *</span>
+                <span className="label-text font-semibold text-black">Password *</span>
               </label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="input input-bordered"
+                className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 placeholder="••••••••"
                 required
               />
@@ -337,14 +336,14 @@ const Register = () => {
             {/* Confirm Password */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Confirm Password *</span>
+                <span className="label-text font-semibold text-black">Confirm Password *</span>
               </label>
               <input
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="input input-bordered"
+                className="input input-bordered bg-white/80 text-black placeholder-gray-700 border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 placeholder="••••••••"
                 required
               />
@@ -353,8 +352,8 @@ const Register = () => {
             {/* Submit Button */}
             <button
               type="submit"
+              className="btn w-full bg-black text-white font-bold shadow-lg hover:bg-gray-900 hover:scale-105 transition-all"
               disabled={loading}
-              className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0 w-full shadow-lg hover:shadow-xl hover:scale-105 transition-all font-bold"
             >
               {loading ? (
                 <span className="loading loading-spinner"></span>
