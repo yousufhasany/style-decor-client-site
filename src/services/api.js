@@ -34,12 +34,10 @@ api.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       console.error('API Error:', error.response.data);
-      
-      if (error.response.status === 401) {
-        // Handle unauthorized access
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
+      // Note: we no longer force a redirect to /login here on 401.
+      // Protected routes and components should handle auth/role issues
+      // so that admin/decorator dashboards are not bounced back to login
+      // just because one API call failed.
     } else if (error.request) {
       // Request made but no response received
       console.error('Network Error:', error.request);

@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
 
 // ProtectedRoute
 // - Always checks Firebase auth
 // - Optionally checks role ONLY when requiredRole is provided
 // - Never sends you to /login because of role; only because of auth
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { currentUser, loading: authLoading } = useAuth();
+  const { currentUser, userRole, loading: authLoading } = useAuth();
   const location = useLocation();
-  const [roleLoading, setRoleLoading] = useState(!!requiredRole);
-  const [hasRequiredRole, setHasRequiredRole] = useState(true); // default true when no role
 
   console.log('=== PROTECTED ROUTE SIMPLE+ROLE ===', {
     path: location.pathname,
     hasUser: !!currentUser,
     authLoading,
     requiredRole,
-    roleLoading,
-    hasRequiredRole
+    userRole
   });
 
   // 1) Auth check
@@ -43,31 +39,9 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   if (!requiredRole) {
     return children;
   }
-
-  // 3) When a specific role is required (admin/decorator), fetch role once
-  useEffect(() => {
-    const fetchRole = async () => {
-      if (!requiredRole || !currentUser) return;
-
-      try {
-        setRoleLoading(true);
-        const response = await api.get(`/users/${currentUser.uid}`);
-        const role = response.data.user?.role || response.data.role || 'user';
-        console.log('=== PROTECTED ROUTE: fetched role ===', role);
-        setHasRequiredRole(role === requiredRole);
-      } catch (error) {
-        console.error('=== PROTECTED ROUTE: error fetching role ===', error);
-        // On error, just deny access to this protected page
-        setHasRequiredRole(false);
-      } finally {
-        setRoleLoading(false);
-      }
-    };
-
-    fetchRole();
-  }, [currentUser, requiredRole]);
-
-  if (roleLoading) {
+  // 3) When a specific role is required (admin/decorator),
+  //    rely on userRole from AuthContext (already loaded there)
+  if (!userRole) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
         <div className="text-center">
@@ -78,7 +52,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     );
   }
 
-  if (!hasRequiredRole) {
+  if (userRole !== requiredRole) {
     // Show a simple 403 page instead of redirecting to login
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">

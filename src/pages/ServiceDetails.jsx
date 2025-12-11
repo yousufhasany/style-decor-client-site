@@ -173,7 +173,7 @@ const ServiceDetails = () => {
         <p className="mt-4 text-gray-600">Loading service details...</p>
       </div>
     );
-  }     <span className="loading loading-spinner loading-lg text-purple-600"></span>
+  }
   if (!service) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">

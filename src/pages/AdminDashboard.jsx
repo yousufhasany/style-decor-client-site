@@ -57,16 +57,19 @@ const AdminDashboard = () => {
         api.get('/analytics/revenue-by-category')
       ]);
       
-      setServices(servicesRes.data.services || servicesRes.data || []);
-      setDecorators(decoratorsRes.data.decorators || decoratorsRes.data || []);
-      setBookings(bookingsRes.data.bookings || bookingsRes.data || []);
+      // getAllServices returns { success, count, data: [...] }
+      setServices(servicesRes.data.data || servicesRes.data.services || servicesRes.data || []);
+      // getAllDecorators returns { success, count, data: [...] }
+      setDecorators(decoratorsRes.data.data || decoratorsRes.data.decorators || decoratorsRes.data || []);
+      // For admin, getAllBookings returns { success, count, data: [...] }
+      setBookings(bookingsRes.data.data || bookingsRes.data.bookings || bookingsRes.data || []);
 
       const summary = summaryRes.data?.data || {};
       setStats({
         totalRevenue: summary.totalRevenue || 0,
         totalBookings: summary.totalBookings || 0,
-        totalServices: summary.totalServices || (servicesRes.data.services?.length || servicesRes.data?.length || 0),
-        totalDecorators: summary.totalDecorators || (decoratorsRes.data.decorators?.length || decoratorsRes.data?.length || 0)
+        totalServices: summary.totalServices || (servicesRes.data.data?.length || servicesRes.data.services?.length || servicesRes.data?.length || 0),
+        totalDecorators: summary.totalDecorators || (decoratorsRes.data.data?.length || decoratorsRes.data.decorators?.length || decoratorsRes.data?.length || 0)
       });
 
       const trendData = trendRes.data?.data || [];
@@ -486,13 +489,19 @@ const AdminDashboard = () => {
                     {services.map((service) => (
                       <tr key={service._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900">{service.title}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {service.service_name || service.title || 'Untitled Service'}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{service.type}</td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">₹{service.price}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {service.category || service.type || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          ৳{(service.cost ?? service.price ?? 0).toLocaleString()}
+                        </td>
                         <td className="px-6 py-4">
                           <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                            {service.status}
+                            {service.status || 'active'}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -593,13 +602,101 @@ const AdminDashboard = () => {
           {/* Bookings Tab */}
           {activeTab === 'bookings' && (
             <>
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
-                <p className="text-gray-500 mt-1">Manage and assign bookings to decorators</p>
+              <div className="mb-8 flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
+                  <p className="text-gray-500 mt-1">Manage and assign bookings to decorators</p>
+                </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <p className="text-gray-500">Bookings management interface will be displayed here.</p>
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                {bookings.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    No bookings found yet.
+                  </div>
+                ) : (
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Decorator</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {bookings.map((booking) => {
+                        const service = booking.serviceId || {};
+                        const customer = booking.userInfo || {};
+                        const bookingDate = booking.serviceDate || booking.date;
+                        const decoratorId = booking.assignedDecorator;
+                        const assignedDecorator = decorators.find(d => String(d._id) === String(decoratorId));
+
+                        return (
+                          <tr key={booking._id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              {service.service_name || 'Service'}
+                              {service.category && (
+                                <span className="ml-2 text-xs text-gray-500 capitalize">({service.category})</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              <div className="font-medium text-gray-900">{customer.name}</div>
+                              <div className="text-xs text-gray-500">{customer.email}</div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {bookingDate ? new Date(bookingDate).toLocaleDateString() : 'N/A'}
+                            </td>
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                              ৳{(service.cost || 0).toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700 capitalize">
+                                {booking.status || booking.bookingStatus || 'pending'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {assignedDecorator ? (
+                                <>
+                                  <div className="font-medium text-gray-900">{assignedDecorator.name}</div>
+                                  <div className="text-xs text-gray-500">{assignedDecorator.email}</div>
+                                </>
+                              ) : (
+                                <span className="text-xs text-gray-400">Not assigned</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center space-x-2">
+                                <select
+                                  className="select select-xs select-bordered"
+                                  defaultValue=""
+                                  onChange={(e) => {
+                                    const id = e.target.value;
+                                    if (!id) return;
+                                    handleAssignDecorator(booking._id, id);
+                                    e.target.value = '';
+                                  }}
+                                >
+                                  <option value="" disabled>
+                                    Assign decorator
+                                  </option>
+                                  {decorators.map((decorator) => (
+                                    <option key={decorator._id} value={decorator._id}>
+                                      {decorator.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </>
           )}
