@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import DecoratorDashboard from './pages/DecoratorDashboard';
+import PaymentSuccess from './pages/PaymentSuccess';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -35,6 +36,7 @@ function App() {
               <Route path="/coverage-map" element={<ServiceCoverageMap />} />
               <Route path="/bookings" element={<Bookings />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
 

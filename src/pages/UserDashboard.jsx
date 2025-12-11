@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
+import { bookingsAPI, paymentsAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 const UserDashboard = () => {
   const { currentUser } = useAuth();
   const [bookings, setBookings] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('bookings');
   const [stats, setStats] = useState({
     totalBookings: 0,
@@ -18,22 +20,29 @@ const UserDashboard = () => {
   });
 
   useEffect(() => {
-    fetchBookings();
+    if (currentUser?.email) {
+      fetchBookings();
+      fetchPayments();
+    }
   }, [currentUser]);
 
   const fetchBookings = async () => {
     try {
-      const response = await api.get(`/bookings?user=${currentUser.email}`);
-      const bookingsData = response.data.bookings || response.data || [];
+      const response = await bookingsAPI.getByUserId(currentUser.email);
+      const bookingsData = response.data.bookings || response.data.data || response.data || [];
       setBookings(bookingsData);
       
       // Calculate stats
       const totalBookings = bookingsData.length;
-      const pendingBookings = bookingsData.filter(b => b.status === 'pending').length;
-      const completedBookings = bookingsData.filter(b => b.status === 'completed').length;
-      const totalSpent = bookingsData.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+      const pendingBookings = bookingsData.filter(b => b.status?.toLowerCase() === 'pending').length;
+      const completedBookings = bookingsData.filter(b => b.status?.toLowerCase() === 'completed').length;
       
-      setStats({ totalBookings, pendingBookings, completedBookings, totalSpent });
+      setStats(prev => ({
+        ...prev,
+        totalBookings,
+        pendingBookings,
+        completedBookings
+      }));
     } catch (error) {
       console.error('Error fetching bookings:', error);
       // Mock data
@@ -58,9 +67,36 @@ const UserDashboard = () => {
         }
       ];
       setBookings(mockBookings);
-      setStats({ totalBookings: 2, pendingBookings: 1, completedBookings: 0, totalSpent: 7000 });
+      setStats(prev => ({
+        ...prev,
+        totalBookings: 2,
+        pendingBookings: 1,
+        completedBookings: 0
+      }));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPayments = async () => {
+    try {
+      setPaymentsLoading(true);
+      const response = await paymentsAPI.getByUserEmail(currentUser.email);
+      const paymentsData = response.data.data || response.data.payments || response.data || [];
+      const normalized = Array.isArray(paymentsData) ? paymentsData : [];
+      setPayments(normalized);
+
+      const totalSpent = normalized.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+      setStats(prev => ({
+        ...prev,
+        totalSpent
+      }));
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      setPayments([]);
+    } finally {
+      setPaymentsLoading(false);
     }
   };
 
@@ -68,7 +104,7 @@ const UserDashboard = () => {
     if (!window.confirm('Are you sure you want to cancel this booking?')) return;
 
     try {
-      await api.delete(`/bookings/${bookingId}`);
+      await bookingsAPI.cancel(bookingId);
       toast.success('Booking cancelled successfully');
       fetchBookings();
     } catch (error) {
@@ -112,6 +148,20 @@ const UserDashboard = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               <span className="font-medium">My Bookings</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                activeTab === 'payments'
+                  ? 'bg-emerald-50 text-emerald-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-medium">Payment History</span>
             </button>
 
             <button
@@ -205,7 +255,7 @@ const UserDashboard = () => {
                 </div>
               </div>
               <div className="flex items-baseline">
-                <h3 className="text-3xl font-bold text-gray-900">₹{stats.totalSpent.toLocaleString()}</h3>
+                <h3 className="text-3xl font-bold text-gray-900">৳{stats.totalSpent.toLocaleString()}</h3>
                 <span className="ml-2 text-sm text-green-600 flex items-center">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
@@ -266,68 +316,71 @@ const UserDashboard = () => {
             </motion.div>
           </div>
 
-          {/* Bookings Table */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl border border-gray-200"
-          >
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">My Bookings</h2>
-            </div>
+          {/* Bookings Tab */}
+          {activeTab === 'bookings' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-xl border border-gray-200"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <h2 className="text-xl font-bold text-gray-900">My Bookings</h2>
+              </div>
 
-            {loading ? (
-              <div className="p-12 text-center">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-              </div>
-            ) : bookings.length === 0 ? (
-              <div className="p-12 text-center">
-                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
-                <p className="text-gray-500 mb-6">Start booking our amazing decoration services!</p>
-                <Link to="/services" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all">
-                  Browse Services
-                </Link>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {bookings.map((booking) => (
-                      <tr key={booking._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div>
+              {loading ? (
+                <div className="p-12 text-center">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                </div>
+              ) : bookings.length === 0 ? (
+                <div className="p-12 text-center">
+                  <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
+                  <p className="text-gray-500 mb-6">Start booking our amazing decoration services!</p>
+                  <Link to="/services" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all">
+                    Browse Services
+                  </Link>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {bookings.map((booking) => (
+                        <tr key={booking._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {booking.serviceId?.service_name || 'N/A'}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {booking.serviceId?.category || 'N/A'}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">{new Date(booking.serviceDate || booking.date).toLocaleDateString()}</div>
+                            <div className="text-sm text-gray-500">{booking.serviceTime || booking.time || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 max-w-xs truncate">{booking.location?.address || booking.address || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
-                              {booking.serviceId?.title || 'N/A'}
+                              {booking.serviceId?.cost ? `৳${booking.serviceId.cost.toLocaleString()}` : 'N/A'}
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {booking.serviceId?.type || 'N/A'}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{booking.date}</div>
-                          <div className="text-sm text-gray-500">{booking.time}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-xs truncate">{booking.address}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">₹{booking.totalAmount?.toLocaleString()}</div>
-                        </td>
+                          </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(booking.status)}`}>
                             {booking.status}
@@ -350,6 +403,92 @@ const UserDashboard = () => {
               </div>
             )}
           </motion.div>
+          )}
+
+          {/* Payments Tab */}
+          {activeTab === 'payments' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-xl border border-gray-200 mt-8"
+            >
+              <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">Payment History</h2>
+                <span className="text-sm text-gray-500">
+                  Total Paid: <span className="font-semibold">৳{stats.totalSpent.toLocaleString()}</span>
+                </span>
+              </div>
+
+              {paymentsLoading ? (
+                <div className="p-12 text-center">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                </div>
+              ) : payments.length === 0 ? (
+                <div className="p-12 text-center">
+                  <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No payments yet</h3>
+                  <p className="text-gray-500 mb-6">Your successful payments will appear here.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {payments.map((payment) => (
+                        <tr key={payment._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {new Date(payment.createdAt).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {payment.booking?.serviceId?.service_name || 'Service Booking'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            ৳{payment.amount?.toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              payment.status === 'paid'
+                                ? 'bg-green-100 text-green-800'
+                                : payment.status === 'failed'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {payment.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            {payment.receiptUrl ? (
+                              <a
+                                href={payment.receiptUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-purple-600 hover:text-purple-800 font-medium"
+                              >
+                                View Receipt
+                              </a>
+                            ) : (
+                              <span className="text-gray-400">N/A</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
         </div>
       </main>
     </div>

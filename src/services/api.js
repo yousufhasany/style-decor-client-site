@@ -71,6 +71,16 @@ export const bookingsAPI = {
   cancel: (id) => api.delete(`/bookings/${id}`)
 };
 
+// API methods for payments
+export const paymentsAPI = {
+  createCheckoutSessionForBooking: (bookingId) =>
+    api.post('/payments/create-checkout-session', { bookingId }),
+  confirmFromSession: (sessionId) =>
+    api.post('/payments/confirm', { sessionId }),
+  getByUserEmail: (email) =>
+    api.get(`/payments/user/${email}`)
+};
+
 // API methods for users
 export const usersAPI = {
   create: (data) => api.post('/users', data),

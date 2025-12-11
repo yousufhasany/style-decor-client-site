@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { bookingsAPI } from '../services/api';
+import { bookingsAPI, paymentsAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 const Bookings = () => {
@@ -53,6 +53,22 @@ const Bookings = () => {
     } catch (error) {
       console.error('Error cancelling booking:', error);
       toast.error('Failed to cancel booking');
+    }
+  };
+
+  const handlePayNow = async (bookingId) => {
+    try {
+      const response = await paymentsAPI.createCheckoutSessionForBooking(bookingId);
+      const { url } = response.data || {};
+
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error('Failed to start payment session');
+      }
+    } catch (error) {
+      console.error('Error starting payment session:', error);
+      toast.error('Failed to start payment');
     }
   };
 
@@ -277,6 +293,14 @@ const Bookings = () => {
                         >
                           View Service
                         </Link>
+                      )}
+                      {booking.paymentStatus !== 'paid' && booking.status?.toLowerCase() !== 'cancelled' && (
+                        <button
+                          onClick={() => handlePayNow(booking._id)}
+                          className="btn btn-sm bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0"
+                        >
+                          Pay Now
+                        </button>
                       )}
                       
                       {booking.status?.toLowerCase() === 'pending' && (

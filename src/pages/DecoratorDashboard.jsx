@@ -17,20 +17,24 @@ const DecoratorDashboard = () => {
   });
 
   useEffect(() => {
-    fetchProjects();
+    if (currentUser?.uid) {
+      fetchProjects();
+    }
   }, [currentUser]);
 
   const fetchProjects = async () => {
     try {
       const response = await api.get(`/bookings/decorator/${currentUser.uid}`);
-      const projectsData = response.data.bookings || response.data || [];
+      const projectsData = response.data.bookings || response.data.data || response.data || [];
       setProjects(projectsData);
 
       // Calculate stats
       const totalProjects = projectsData.length;
-      const activeProjects = projectsData.filter(p => p.status === 'in-progress' || p.status === 'confirmed').length;
-      const completedProjects = projectsData.filter(p => p.status === 'completed').length;
-      const totalEarnings = projectsData.filter(p => p.status === 'completed').reduce((sum, p) => sum + (p.decoratorEarning || p.totalAmount * 0.7), 0);
+      const activeProjects = projectsData.filter(p => p.status?.toLowerCase() === 'in-progress' || p.status?.toLowerCase() === 'confirmed').length;
+      const completedProjects = projectsData.filter(p => p.status?.toLowerCase() === 'completed').length;
+      const totalEarnings = projectsData
+        .filter(p => p.status?.toLowerCase() === 'completed')
+        .reduce((sum, p) => sum + (p.decoratorEarning || (p.totalAmount || 0) * 0.7), 0);
 
       setStats({ totalProjects, activeProjects, completedProjects, totalEarnings });
     } catch (error) {
@@ -247,7 +251,7 @@ const DecoratorDashboard = () => {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">₹{stats.totalEarnings.toLocaleString()}</h3>
+              <h3 className="text-3xl font-bold text-gray-900">৳{stats.totalEarnings.toLocaleString()}</h3>
             </motion.div>
           </div>
 
@@ -290,7 +294,7 @@ const DecoratorDashboard = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-500">Your Earning</p>
-                        <p className="text-2xl font-bold text-purple-600">₹{project.decoratorEarning?.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-purple-600">৳{project.decoratorEarning?.toLocaleString()}</p>
                       </div>
                     </div>
 
@@ -343,7 +347,7 @@ const DecoratorDashboard = () => {
                       <p className="font-medium text-gray-900">{project.serviceId?.title}</p>
                       <p className="text-sm text-gray-500">{project.date}</p>
                     </div>
-                    <p className="text-lg font-bold text-green-600">₹{project.decoratorEarning?.toLocaleString()}</p>
+                    <p className="text-lg font-bold text-green-600">৳{project.decoratorEarning?.toLocaleString()}</p>
                   </div>
                 ))}
                 {projects.filter(p => p.status === 'completed').length === 0 && (

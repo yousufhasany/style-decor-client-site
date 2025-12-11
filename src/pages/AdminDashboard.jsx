@@ -33,28 +33,14 @@ const AdminDashboard = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [stats, setStats] = useState({
-    totalRevenue: 34650,
-    totalBookings: 1136,
-    totalServices: 24,
-    totalDecorators: 18
+    totalRevenue: 0,
+    totalBookings: 0,
+    totalServices: 0,
+    totalDecorators: 0
   });
 
-  const revenueData = [
-    { month: 'Jan', revenue: 2800 },
-    { month: 'Feb', revenue: 3200 },
-    { month: 'Mar', revenue: 2900 },
-    { month: 'Apr', revenue: 3500 },
-    { month: 'May', revenue: 3100 },
-    { month: 'Jun', revenue: 3800 }
-  ];
-
-  const serviceTypeData = [
-    { name: 'Wedding', value: 35, color: '#8b5cf6' },
-    { name: 'Birthday', value: 25, color: '#3b82f6' },
-    { name: 'Corporate', value: 20, color: '#10b981' },
-    { name: 'Interior', value: 15, color: '#f59e0b' },
-    { name: 'Other', value: 5, color: '#ef4444' }
-  ];
+  const [revenueData, setRevenueData] = useState([]);
+  const [serviceTypeData, setServiceTypeData] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -62,15 +48,40 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [servicesRes, decoratorsRes, bookingsRes] = await Promise.all([
+      const [servicesRes, decoratorsRes, bookingsRes, summaryRes, trendRes, revenueByCategoryRes] = await Promise.all([
         api.get('/services'),
         api.get('/decorators'),
-        api.get('/bookings')
+        api.get('/bookings'),
+        api.get('/analytics/summary'),
+        api.get('/analytics/bookings-trend?days=30'),
+        api.get('/analytics/revenue-by-category')
       ]);
       
       setServices(servicesRes.data.services || servicesRes.data || []);
       setDecorators(decoratorsRes.data.decorators || decoratorsRes.data || []);
       setBookings(bookingsRes.data.bookings || bookingsRes.data || []);
+
+      const summary = summaryRes.data?.data || {};
+      setStats({
+        totalRevenue: summary.totalRevenue || 0,
+        totalBookings: summary.totalBookings || 0,
+        totalServices: summary.totalServices || (servicesRes.data.services?.length || servicesRes.data?.length || 0),
+        totalDecorators: summary.totalDecorators || (decoratorsRes.data.decorators?.length || decoratorsRes.data?.length || 0)
+      });
+
+      const trendData = trendRes.data?.data || [];
+      setRevenueData(trendData.map(item => ({
+        month: item.date,
+        revenue: item.bookings
+      })));
+
+      const categoryData = revenueByCategoryRes.data?.data || [];
+      const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899'];
+      setServiceTypeData(categoryData.map((item, index) => ({
+        name: item.category,
+        value: item.revenue,
+        color: colors[index % colors.length]
+      })));
     } catch (error) {
       console.error('Error fetching data:', error);
       // Mock data
@@ -346,7 +357,7 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                   <div className="flex items-baseline">
-                    <h3 className="text-3xl font-bold text-gray-900">₹{stats.totalRevenue.toLocaleString()}K</h3>
+                    <h3 className="text-3xl font-bold text-gray-900">৳{stats.totalRevenue.toLocaleString()}</h3>
                     <span className="ml-2 text-sm text-green-600 flex items-center">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
@@ -404,7 +415,7 @@ const AdminDashboard = () => {
               {/* Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-white rounded-xl p-6 border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-6">Revenue Overview</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-6">Bookings Trend (Last 30 Days)</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={revenueData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -417,7 +428,7 @@ const AdminDashboard = () => {
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-white rounded-xl p-6 border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-6">Services by Category</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-6">Revenue by Service Category</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie data={serviceTypeData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value">
@@ -432,7 +443,7 @@ const AdminDashboard = () => {
                     {serviceTypeData.map((item) => (
                       <div key={item.name} className="flex items-center space-x-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                        <span className="text-sm text-gray-600">{item.name} - {item.value}%</span>
+                        <span className="text-sm text-gray-600">{item.name} - ৳{item.value.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
