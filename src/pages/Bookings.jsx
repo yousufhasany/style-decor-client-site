@@ -10,6 +10,9 @@ const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, confirmed, completed, cancelled
+  const [ratingValues, setRatingValues] = useState({}); // { [bookingId]: number }
+  const [reviewValues, setReviewValues] = useState({}); // { [bookingId]: string }
+  const [submittingRatingId, setSubmittingRatingId] = useState(null);
 
   useEffect(() => {
     if (currentUser) {
@@ -29,6 +32,15 @@ const Bookings = () => {
       
       if (Array.isArray(fetchedBookings)) {
         setBookings(fetchedBookings);
+        // Prefill rating/review state from existing data
+        const initialRatings = {};
+        const initialReviews = {};
+        fetchedBookings.forEach(b => {
+          if (b.userRating) initialRatings[b._id] = b.userRating;
+          if (b.userReview) initialReviews[b._id] = b.userReview;
+        });
+        setRatingValues(initialRatings);
+        setReviewValues(initialReviews);
       } else {
         setBookings([]);
       }
@@ -69,6 +81,28 @@ const Bookings = () => {
     } catch (error) {
       console.error('Error starting payment session:', error);
       toast.error('Failed to start payment');
+    }
+  };
+
+  const handleSubmitRating = async (bookingId) => {
+    const rating = Number(ratingValues[bookingId]);
+    const review = reviewValues[bookingId] || '';
+
+    if (!rating || rating < 1 || rating > 5) {
+      toast.error('Please select a rating between 1 and 5');
+      return;
+    }
+
+    try {
+      setSubmittingRatingId(bookingId);
+      await bookingsAPI.rate(bookingId, { rating, review });
+      toast.success('Thank you for your feedback!');
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      toast.error('Failed to submit rating');
+    } finally {
+      setSubmittingRatingId(null);
     }
   };
 
@@ -315,6 +349,70 @@ const Bookings = () => {
                       <div className="text-xs text-gray-500 mt-2">
                         Booked on: {new Date(booking.createdAt).toLocaleDateString()}
                       </div>
+
+                      {/* Rating & Review for completed bookings */}
+                      {booking.status?.toLowerCase() === 'completed' && (
+                        <div className="w-full mt-4">
+                          {booking.userRating ? (
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-3 w-full">
+                              <div className="flex items-center gap-2 mb-1">
+                                <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <span className="font-semibold text-emerald-700">Your rating: {booking.userRating}/5</span>
+                              </div>
+                              {booking.userReview && (
+                                <p className="text-xs text-emerald-800 mt-1">“{booking.userReview}”</p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-3 w-full">
+                              <p className="text-xs text-gray-700 mb-2 font-medium">
+                                How was your decorator? Rate your experience:
+                              </p>
+                              <div className="flex items-center gap-1 mb-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setRatingValues(prev => ({ ...prev, [booking._id]: star }))}
+                                    className="focus:outline-none"
+                                  >
+                                    <svg
+                                      className={`w-6 h-6 ${
+                                        (ratingValues[booking._id] || 0) >= star
+                                          ? 'text-yellow-400'
+                                          : 'text-gray-300'
+                                      }`}
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                  </button>
+                                ))}
+                              </div>
+                              <textarea
+                                rows={2}
+                                className="textarea textarea-bordered w-full text-xs mb-2"
+                                placeholder="Share a short feedback (optional)"
+                                value={reviewValues[booking._id] || ''}
+                                onChange={(e) =>
+                                  setReviewValues(prev => ({ ...prev, [booking._id]: e.target.value }))
+                                }
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleSubmitRating(booking._id)}
+                                disabled={submittingRatingId === booking._id}
+                                className="btn btn-xs bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white border-0"
+                              >
+                                {submittingRatingId === booking._id ? 'Submitting...' : 'Submit Rating'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -89,8 +89,9 @@ const DecoratorDashboard = () => {
       toast.success('Status updated successfully');
       fetchProjects();
     } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update status');
+      console.error('Error updating status:', error?.response?.data || error);
+      const message = error?.response?.data?.message || 'Failed to update status';
+      toast.error(message);
     }
   };
 

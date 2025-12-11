@@ -66,7 +66,8 @@ export const bookingsAPI = {
   getByUserId: (userId) => api.get(`/bookings/user/${userId}`),
   getById: (id) => api.get(`/bookings/${id}`),
   update: (id, data) => api.put(`/bookings/${id}`, data),
-  cancel: (id) => api.delete(`/bookings/${id}`)
+  cancel: (id) => api.delete(`/bookings/${id}`),
+  rate: (id, data) => api.patch(`/bookings/${id}/rating`, data)
 };
 
 // API methods for payments
