@@ -13,7 +13,7 @@ const Login = () => {
     password: ''
   });
 
-  const from = location.state?.from || '/';
+  const from = location.state?.from || null;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +26,15 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate(from, { replace: true });
+
+      // If we were redirected here from a protected page, go back there.
+      // Otherwise, send the user to the generic dashboard, which
+      // will route them to the correct dashboard based on role.
+      if (from) {
+        navigate(from, { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (error) {
       console.error('Login error:', error);
       // Error is already handled by AuthContext
@@ -39,7 +47,12 @@ const Login = () => {
     setLoading(true);
     try {
       await signInWithGoogle();
-      navigate(from, { replace: true });
+
+      if (from) {
+        navigate(from, { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (error) {
       console.error('Google sign-in error:', error);
     } finally {

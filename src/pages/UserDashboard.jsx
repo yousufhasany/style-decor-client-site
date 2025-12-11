@@ -113,6 +113,22 @@ const UserDashboard = () => {
     }
   };
 
+  const handlePayNow = async (bookingId) => {
+    try {
+      const response = await paymentsAPI.createCheckoutSessionForBooking(bookingId);
+      const { url } = response.data || {};
+
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error('Failed to start payment session');
+      }
+    } catch (error) {
+      console.error('Error starting payment session:', error);
+      toast.error('Failed to start payment');
+    }
+  };
+
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800',
@@ -386,7 +402,15 @@ const UserDashboard = () => {
                             {booking.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm space-x-3">
+                          {booking.paymentStatus !== 'paid' && booking.status?.toLowerCase() !== 'cancelled' && (
+                            <button
+                              onClick={() => handlePayNow(booking._id)}
+                              className="text-purple-600 hover:text-purple-900 font-medium"
+                            >
+                              Pay Now
+                            </button>
+                          )}
                           {booking.status === 'pending' && (
                             <button
                               onClick={() => handleCancelBooking(booking._id)}

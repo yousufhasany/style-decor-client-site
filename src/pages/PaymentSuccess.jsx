@@ -58,8 +58,8 @@ const PaymentSuccess = () => {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-red-600 mb-4">Payment Error</h2>
           <p className="text-gray-700 mb-6">{error}</p>
-          <Link to="/bookings" className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
-            Back to My Bookings
+          <Link to="/dashboard/user" className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
+            Back to My Dashboard
           </Link>
         </div>
       </div>
@@ -118,8 +118,8 @@ const PaymentSuccess = () => {
           )}
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/bookings" className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
-              Go to My Bookings
+            <Link to="/dashboard/user" className="btn bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white border-0">
+              Go to My Dashboard
             </Link>
             <Link to="/services" className="btn btn-outline">
               Book Another Service

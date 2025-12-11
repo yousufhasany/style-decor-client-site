@@ -156,8 +156,8 @@ const ServiceDetails = () => {
         address: '',
         notes: ''
       });
-      // Navigate to bookings page to see the newly created booking
-      navigate('/bookings');
+      // Navigate to user dashboard where "My Bookings" lives
+      navigate('/dashboard/user');
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast.error(error.response?.data?.message || 'Failed to submit booking. Please try again.');

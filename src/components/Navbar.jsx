@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
-  const { currentUser, logout, loading } = useAuth();
+  const { currentUser, userRole, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,7 +38,7 @@ const Navbar = () => {
             <span className="text-xs text-gray-400 ml-2">v4</span>
           </Link>
 
-          {/* Center Navigation */}
+          {/* Center Navigation (public pages only as per requirements) */}
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-12">
             <Link 
               to="/" 
@@ -46,18 +46,14 @@ const Navbar = () => {
             >
               Home
             </Link>
-            <Link 
-              to="/services" 
-              className="text-[15px] font-medium text-gray-700 hover:text-purple-600 transition-colors"
-            >
-              Services
-            </Link>
-            <Link 
-              to="/bookings" 
-              className="text-[15px] font-medium text-gray-700 hover:text-purple-600 transition-colors"
-            >
-              My Bookings
-            </Link>
+            {(!currentUser || userRole !== 'decorator') && (
+              <Link 
+                to="/services" 
+                className="text-[15px] font-medium text-gray-700 hover:text-purple-600 transition-colors"
+              >
+                Services
+              </Link>
+            )}
             <Link 
               to="/about" 
               className="text-[15px] font-medium text-gray-700 hover:text-purple-600 transition-colors"
@@ -99,7 +95,15 @@ const Navbar = () => {
                       <span className="text-xs text-gray-500">{currentUser.email}</span>
                     </li>
                     <li><Link to="/profile">Profile Settings</Link></li>
-                    <li><Link to="/bookings">My Bookings</Link></li>
+                    <li>
+                      {userRole === 'decorator' ? (
+                        <Link to="/dashboard/decorator">Decorator Dashboard</Link>
+                      ) : userRole === 'admin' ? (
+                        <Link to="/dashboard/admin">Admin Dashboard</Link>
+                      ) : (
+                        <Link to="/dashboard/user">My Bookings</Link>
+                      )}
+                    </li>
                     <div className="divider my-0"></div>
                     <li><button onClick={handleLogout} className="text-red-600">Logout</button></li>
                   </ul>

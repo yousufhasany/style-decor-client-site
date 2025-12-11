@@ -11,6 +11,7 @@ import {
   browserLocalPersistence
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { usersAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -26,6 +27,8 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   // Set auth persistence to local storage
   useEffect(() => {
@@ -107,6 +110,7 @@ export const AuthProvider = ({ children }) => {
     console.log('=== AUTH CONTEXT v4: Setting up listener ===');
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log('=== AUTH CONTEXT v4: State changed ===', user ? `User: ${user.email}` : 'No user');
+      setLoading(true);
       if (user) {
         // Update token when user is authenticated
         try {
@@ -116,10 +120,29 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Error getting token:', error);
         }
+
+        // Fetch extended user profile (including role) from backend
+        try {
+          const response = await usersAPI.getById(user.uid);
+          const profile = response.data.user || response.data.data || null;
+          const role = response.data.role || profile?.role || null;
+          setUserProfile(profile);
+          setUserRole(role);
+          console.log('=== AUTH CONTEXT v4: Profile loaded ===', {
+            role,
+            hasProfile: !!profile
+          });
+        } catch (error) {
+          console.error('Error fetching user profile in AuthContext:', error);
+          setUserProfile(null);
+          setUserRole(null);
+        }
       } else {
         // No user, remove token
         localStorage.removeItem('token');
         console.log('=== AUTH CONTEXT v4: Token removed, no user ===');
+        setUserProfile(null);
+        setUserRole(null);
       }
       setCurrentUser(user);
       setLoading(false);
@@ -134,6 +157,8 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    userProfile,
+    userRole,
     loading,
     register,
     login,

@@ -15,7 +15,8 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     phone: '',
-    profileImage: null
+    profileImage: null,
+    accountType: 'user' // user | decorator (request)
   });
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -117,7 +118,7 @@ const Register = () => {
         photoURL
       );
 
-      // Create user record in backend
+      // Create user record in backend (and request role)
       try {
         await api.post('/users', {
           uid: user.uid,
@@ -125,14 +126,19 @@ const Register = () => {
           email: formData.email,
           phone: formData.phone,
           photoURL: photoURL,
-          role: 'user'
+          requestedRole: formData.accountType
         });
       } catch (apiError) {
         console.error('Error creating user record:', apiError);
         // Don't block registration if API call fails
       }
 
-      navigate('/');
+      // Redirect based on requested account type
+      if (formData.accountType === 'decorator') {
+        navigate('/dashboard/decorator');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error('Registration error:', error);
       // Error is already handled by AuthContext
@@ -153,7 +159,7 @@ const Register = () => {
           name: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
-          role: 'user'
+          requestedRole: 'user'
         });
       } catch (apiError) {
         console.error('Error creating user record:', apiError);
@@ -284,6 +290,27 @@ const Register = () => {
                 className="input input-bordered"
                 placeholder="+91 1234567890"
               />
+            </div>
+
+            {/* Account Type (request) */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Account Type</span>
+              </label>
+              <select
+                name="accountType"
+                value={formData.accountType}
+                onChange={handleInputChange}
+                className="select select-bordered w-full"
+              >
+                <option value="user">User (Book decoration services)</option>
+                <option value="decorator">Decorator (I want to work as decorator)</option>
+              </select>
+              <label className="label">
+                <span className="label-text-alt text-gray-500 text-xs">
+                  Note: Admin will review and approve decorator accounts. Selecting "Decorator" here does not immediately give decorator access.
+                </span>
+              </label>
             </div>
 
             {/* Password */}

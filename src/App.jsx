@@ -13,6 +13,7 @@ import Bookings from './pages/Bookings';
 import Contact from './pages/Contact';
 import Dashboard from './pages/Dashboard';
 import UserDashboard from './pages/UserDashboard';
+import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import DecoratorDashboard from './pages/DecoratorDashboard';
 import PaymentSuccess from './pages/PaymentSuccess';
@@ -40,8 +41,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
 
-              {/* Keep normal dashboard/profile open (no role checks) */}
-              <Route path="/profile" element={<UserDashboard />} />
+              {/* Profile page (simple view for any role) */}
+              <Route path="/profile" element={<Profile />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/user" element={<UserDashboard />} />
 
